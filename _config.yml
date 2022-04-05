@@ -18,6 +18,7 @@ subtitle: Azure Blog
 logo: "/assets/images/About/Aabyehald-Logo.png"
 email: jesper.hald@aabyehald.com
 description: "A blogging site about Azure, both from an Architect perspective and from an Engineering perspective."
+og_image: "/assets/images/About/AabyeHaldPost.jpg"
 
 # twitter_username: username
 github_username: AabyeHald
