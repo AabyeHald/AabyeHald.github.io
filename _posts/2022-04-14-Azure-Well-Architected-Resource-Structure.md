@@ -1,14 +1,14 @@
 ---
 classes: wide
-title: "Well Architected Resource Structure"
-excerpt: "Enterprise Scale Landing Zone, Landing Zones, Resource Structure design patterns and how to handle connectivity - when the datacenter becomes Cloud based."
+title: "Azure: Well Architected Resource Structure"
+excerpt: "Enterprise Scale Landing Zone, Landing Zones, Resource Structure design patterns and how to handle connectivity - when the datacenter becomes Azure Cloud based."
 categories:
   - Article
 tags:
   - Architecture
   - Level 100
 ---
-*Enterprise Scale Landing Zone, Landing Zones, Resource Structure design patterns and how to handle connectivity - when the datacenter becomes Cloud based.*
+*Enterprise Scale Landing Zone, Landing Zones, Resource Structure design patterns and how to handle connectivity - when the datacenter becomes Azure Cloud based.*
 
 If we start out from the beginning, in ancient times, around the year 2015, businesses started to talk about cloud and digitalization for real and the need for both in order for the businesses to survive in an increasingly competitive market.
 
