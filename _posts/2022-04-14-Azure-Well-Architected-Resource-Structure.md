@@ -1,6 +1,8 @@
 ---
 classes: wide
 title: "Azure: Well Architected Resource Structure"
+header:
+  og_image: "/assets/images/ArticleLogos/2022-04-14-Azure-Well-Architected-Resource-Structure.jpg"
 excerpt: "Enterprise Scale Landing Zone, Landing Zones, Resource Structure design patterns and how to handle connectivity - when the datacenter becomes Azure Cloud based."
 categories:
   - Article
