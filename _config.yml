@@ -15,7 +15,7 @@
 # in the templates via {{ site.myvariable }}.
 title: AabyeHald
 subtitle: Azure Blog
-logo: "/assets/images/About/AabyeHald-ArticleLogo.png"
+logo: "/assets/images/About/AabyeHald-ArticleLogo.jpg"
 email: jesper.hald@aabyehald.com
 description: "A blogging site about Azure, both from an Architect perspective and from an Engineering perspective."
 og_image: "/assets/images/About/AabyeHald-Post.jpg"
