@@ -15,10 +15,10 @@
 # in the templates via {{ site.myvariable }}.
 title: AabyeHald
 subtitle: Azure Blog
-logo: "/assets/images/About/AabyeHald-ArticleLogo.jpg"
+logo: "/assets/images/About/AabyeHald-Logo.png"
 email: jesper.hald@aabyehald.com
 description: "A blogging site about Azure, both from an Architect perspective and from an Engineering perspective."
-og_image: "/assets/images/About/AabyeHald-Post.jpg"
+og_image: "/assets/images/About/AabyeHald-ArticleLogo.jpg"
 
 # twitter_username: username
 github_username: AabyeHald
