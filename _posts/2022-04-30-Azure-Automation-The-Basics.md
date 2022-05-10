@@ -77,23 +77,23 @@ A System Worker is installed automatically when a VM is associated with a Log An
 A User Worker has a different featureset than a System Worker - this type of worker can execute user-defined runbooks, but not hidden runbooks. A User Worker are a member of a Worker Group, on which a Runbook can be scheduled to run.<br>
 When registering a User Worker, the easiest way is to start out with a System Worker - then the script below will be all you need:
 
-{% highlight PowerShell linenos %}
-# Register the Virtual Machine workers
-$RegistrationInfo = Get-AzAutomationRegistrationInfo -ResourceGroupName $ResourceGroupNameAutomationAccount -AutomationAccountName $AutomationAccountName
+{% highlight powershell linenos %}
+  # Register the Virtual Machine workers
+  $RegistrationInfo = Get-AzAutomationRegistrationInfo -ResourceGroupName $ResourceGroupNameAutomationAccount -AutomationAccountName $AutomationAccountName
 
-# Generating the RunCommand script
-@"
-Import-Module "C:\Program Files\Microsoft Monitoring Agent\Agent\AzureAutomation\7.3.1417.0\HybridRegistration\HybridRegistration.psd1"
-Add-HybridRunbookWorker -GroupName "HybridWorkers" -Url $($RegistrationInfo.Endpoint) -Key $($RegistrationInfo.PrimaryKey)
-"@ | Out-File Script.ps1
+  # Generating the RunCommand script
+  @"
+  Import-Module "C:\Program Files\Microsoft Monitoring Agent\Agent\AzureAutomation\7.3.1417.0\HybridRegistration\HybridRegistration.psd1"
+  Add-HybridRunbookWorker -GroupName "HybridWorkers" -Url $($RegistrationInfo.Endpoint) -Key $($RegistrationInfo.PrimaryKey)
+  "@ | Out-File Script.ps1
 
-# Loop the VMs and register them as User Workers
-foreach ($VM in Get-AzVM -ResourceGroupName $ResourceGroupNameWorker) {
-    $null = Invoke-AzVMRunCommand -ResourceGroupName $ResourceGroupNameWorker -VMName $VM.Name `
-    -ScriptPath ".\Script.ps1" -CommandId "RunPowerShellScript" -AsJob
-}
-# Cleaning up RunCommand Script
-Remove-Item ".\Script.ps1" -Force
+  # Loop the VMs and register them as User Workers
+  foreach ($VM in Get-AzVM -ResourceGroupName $ResourceGroupNameWorker) {
+      $null = Invoke-AzVMRunCommand -ResourceGroupName $ResourceGroupNameWorker -VMName $VM.Name `
+      -ScriptPath ".\Script.ps1" -CommandId "RunPowerShellScript" -AsJob
+  }
+  # Cleaning up RunCommand Script
+  Remove-Item ".\Script.ps1" -Force
 {% endhighlight %}
 
 This script will register all VMs in a Resource Group ($ResourceGroupNameWorker) as User Workers, using the RunCommand in Azure. The Custom Script extension could have been used as well, in fact the Custom Script Extension would be required if the VMs where on-premises VMs using Azure Arc for Servers.
@@ -105,61 +105,61 @@ An Azure Automation Account uses the Coordinated Universal Time or UTC standard.
 
 Consider this snippet:
 
-{% highlight PowerShell linenos %}
-$AutomationAccount = Get-AzAutomationAccount
-New-AzAutomationSchedule -AutomationAccountName $AutomationAccount.AutomationAccountName `
-        -ResourceGroupName $AutomationAccount.ResourceGroupName `
-        -Name "Schedule01" -StartTime 20:00 -OneTime -TimeZone UTC
+{% highlight powershell linenos %}
+  $AutomationAccount = Get-AzAutomationAccount
+  New-AzAutomationSchedule -AutomationAccountName $AutomationAccount.AutomationAccountName `
+          -ResourceGroupName $AutomationAccount.ResourceGroupName `
+          -Name "Schedule01" -StartTime 20:00 -OneTime -TimeZone UTC
 {% endhighlight %}
 
 One would expect the schedule to be at 20:00 UTC or 08:00 PM UTC - but this is what happened:
 
-{% highlight PowerShell linenos %}
-StartTime              : 24/04/2022 18.00.00 +00:00
-ExpiryTime             : 24/04/2022 18.00.00 +00:00
-IsEnabled              : True
-NextRun                : 24/04/2022 18.00.00 +00:00
-Interval               : 
-Frequency              : Onetime
-MonthlyScheduleOptions : 
-WeeklyScheduleOptions  : 
-TimeZone               : Etc/UTC
-ResourceGroupName      : rg-weu-AutomationPlatform-demo-001
-AutomationAccountName  : aut-weu-AutomationPlatform-demo-001
-Name                   : Schedule01
-CreationTime           : 24/04/2022 17.27.52 +02:00
-LastModifiedTime       : 24/04/2022 17.46.14 +02:00
-Description            :
+{% highlight powershell linenos %}
+  StartTime              : 24/04/2022 18.00.00 +00:00
+  ExpiryTime             : 24/04/2022 18.00.00 +00:00
+  IsEnabled              : True
+  NextRun                : 24/04/2022 18.00.00 +00:00
+  Interval               : 
+  Frequency              : Onetime
+  MonthlyScheduleOptions : 
+  WeeklyScheduleOptions  : 
+  TimeZone               : Etc/UTC
+  ResourceGroupName      : rg-weu-AutomationPlatform-demo-001
+  AutomationAccountName  : aut-weu-AutomationPlatform-demo-001
+  Name                   : Schedule01
+  CreationTime           : 24/04/2022 17.27.52 +02:00
+  LastModifiedTime       : 24/04/2022 17.46.14 +02:00
+  Description            :
 {% endhighlight %}
 
 To make this work properly you will have to take the UTC/GMT Offset into account, including the Daylight Saving Time (DST):
 
-{% highlight PowerShell linenos %}
-$AutomationAccount = Get-AzAutomationAccount
-$StartTime = (Get-Date 20:00).AddHours([System.TimeZoneInfo]::Local.GetUtcOffset((Get-Date)).TotalHours)
-New-AzAutomationSchedule -AutomationAccountName $AutomationAccount.AutomationAccountName `
-        -ResourceGroupName $AutomationAccount.ResourceGroupName `
-        -Name "Schedule01" -StartTime $StartTime -OneTime -TimeZone UTC
+{% highlight powershell linenos %}
+  $AutomationAccount = Get-AzAutomationAccount
+  $StartTime = (Get-Date 20:00).AddHours([System.TimeZoneInfo]::Local.GetUtcOffset((Get-Date)).TotalHours)
+  New-AzAutomationSchedule -AutomationAccountName $AutomationAccount.AutomationAccountName `
+          -ResourceGroupName $AutomationAccount.ResourceGroupName `
+          -Name "Schedule01" -StartTime $StartTime -OneTime -TimeZone UTC
 {% endhighlight %}
 
 Notice line 2, where the UTC offset is added. The result is now the expected schedule:
 
-{% highlight PowerShell linenos %}
-StartTime              : 24/04/2022 20.00.00 +00:00
-ExpiryTime             : 24/04/2022 20.00.00 +00:00
-IsEnabled              : True
-NextRun                : 24/04/2022 20.00.00 +00:00
-Interval               : 
-Frequency              : Onetime
-MonthlyScheduleOptions : 
-WeeklyScheduleOptions  : 
-TimeZone               : Etc/UTC
-ResourceGroupName      : rg-weu-AutomationPlatform-demo-001
-AutomationAccountName  : aut-weu-AutomationPlatform-demo-001
-Name                   : Schedule01
-CreationTime           : 24/04/2022 17.27.52 +02:00
-LastModifiedTime       : 24/04/2022 17.52.19 +02:00
-Description            :
+{% highlight powershell linenos %}
+  StartTime              : 24/04/2022 20.00.00 +00:00
+  ExpiryTime             : 24/04/2022 20.00.00 +00:00
+  IsEnabled              : True
+  NextRun                : 24/04/2022 20.00.00 +00:00
+  Interval               : 
+  Frequency              : Onetime
+  MonthlyScheduleOptions : 
+  WeeklyScheduleOptions  : 
+  TimeZone               : Etc/UTC
+  ResourceGroupName      : rg-weu-AutomationPlatform-demo-001
+  AutomationAccountName  : aut-weu-AutomationPlatform-demo-001
+  Name                   : Schedule01
+  CreationTime           : 24/04/2022 17.27.52 +02:00
+  LastModifiedTime       : 24/04/2022 17.52.19 +02:00
+  Description            :
 {% endhighlight %}
 
 As each Schedule can be defined in its own timezone, the scheduling can get very complicated fairly fast.<br>
@@ -208,13 +208,13 @@ The best part is that all this data is searchable in the Log Analytics Workspace
 The KUSTO query below lists all Servers, having the "Dependency Agent" installed and the "WindowsAzureGuestAgent" service running - as easy as that.
 
 {% highlight console linenos %}
-ConfigurationData
-| where SoftwareName contains "Dependency Agent"
-| summarize arg_max(TimeGenerated, *)
-| union ConfigurationData
-| where SvcName contains "WindowsAzureGuestAgent" and SvcState contains "running"
-| summarize arg_max(TimeGenerated, *)
-| project Computer
+  ConfigurationData
+  | where SoftwareName contains "Dependency Agent"
+  | summarize arg_max(TimeGenerated, *)
+  | union ConfigurationData
+  | where SvcName contains "WindowsAzureGuestAgent" and SvcState contains "running"
+  | summarize arg_max(TimeGenerated, *)
+  | project Computer
 {% endhighlight %}
 
 ## Runbooks
