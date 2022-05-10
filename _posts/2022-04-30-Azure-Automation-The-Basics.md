@@ -90,7 +90,7 @@ When registering a User Worker, the easiest way is to start out with a System Wo
   # Loop the VMs and register them as User Workers
   foreach ($VM in Get-AzVM -ResourceGroupName $ResourceGroupNameWorker) {
       $null = Invoke-AzVMRunCommand -ResourceGroupName $ResourceGroupNameWorker -VMName $VM.Name `
-      -ScriptPath ".\Script.ps1" -CommandId "RunPowerShellScript" -AsJob
+        -ScriptPath ".\Script.ps1" -CommandId "RunPowerShellScript" -AsJob
   }
   # Cleaning up RunCommand Script
   Remove-Item ".\Script.ps1" -Force
