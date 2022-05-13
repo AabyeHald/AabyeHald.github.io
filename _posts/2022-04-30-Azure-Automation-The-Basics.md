@@ -82,10 +82,15 @@ When registering a User Worker, the easiest way is to start out with a System Wo
   $RegistrationInfo = Get-AzAutomationRegistrationInfo -ResourceGroupName $ResourceGroupNameAutomationAccount -AutomationAccountName $AutomationAccountName
 
   # Generating the RunCommand script
+  @'
+  $RootPath = "C:\Program Files\Microsoft Monitoring Agent\Agent\AzureAutomation\"
+  $Version = $(Get-ChildItem $RootPath | Sort-Object Name -Descending | Select-Object -First 1).Name
+  $ModuleFullName = Join-Path -Path $(Join-Path -Path $RootPath -ChildPath $Version) -ChildPath "HybridRegistration\HybridRegistration.psd1"
+  Import-Module $ModuleFullName
+  '@ | Out-File Script.ps1
   @"
-  Import-Module "C:\Program Files\Microsoft Monitoring Agent\Agent\AzureAutomation\7.3.1417.0\HybridRegistration\HybridRegistration.psd1"
   Add-HybridRunbookWorker -GroupName "HybridWorkers" -Url $($RegistrationInfo.Endpoint) -Key $($RegistrationInfo.PrimaryKey)
-  "@ | Out-File Script.ps1
+  "@ | Out-File .\Script.ps1 -Append
 
   # Loop the VMs and register them as User Workers
   foreach ($VM in Get-AzVM -ResourceGroupName $ResourceGroupNameWorker) {
