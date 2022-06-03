@@ -108,3 +108,10 @@ tag_archive:
   path: /tags/
 atom_feed:
   hide: true
+
+comments:
+  provider: "utterances"
+  utterances:
+    theme: "github-light"
+    issue_term: "pathname"
+    label: "BlogComment"
